@@ -103,24 +103,56 @@ const SignIn = () => {
         }
     }
 
-    const signInwithGoogle = async()=> {
-        signInWithPopup( auth, provider )
-        .then((result) => {
+    // const signInwithGoogle = async()=> {
+    //     signInWithPopup( auth, provider )
+    //     .then((result) => {
             
-            const res = axios.post(import.meta.env.VITE_BACKEND_API + "/auth/google", {
-                name: result.user.displayName,
-                email: result.user.email,
-                img: result.user.photoURL
-                }, {withCredentials: true}).then((result) => {
-                    dispatch(loginSuccess(result.data))
-                    toast("Logged In Successfully")
-                    navigate("/")
-                })
-        })
-        .catch(err=>{
-            dispatch(loginFailure())
-        })
-    }
+    //         const res = axios.post(import.meta.env.VITE_BACKEND_API + "/auth/google", {
+    //             name: result.user.displayName,
+    //             email: result.user.email,
+    //             img: result.user.photoURL
+    //             }, {withCredentials: true}).then((result) => {
+    //                 dispatch(loginSuccess(result.data))
+    //                 toast("Logged In Successfully")
+    //                 navigate("/")
+    //             })
+    //     })
+    //     .catch(err=>{
+    //         dispatch(loginFailure())
+    //     })
+    // }
+
+
+    const signInwithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    
+    const user = result.user;
+    const token = await user.getIdToken();
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_API}/auth/google`,
+      {
+        name: user.displayName,
+        email: user.email,
+        img: user.photoURL,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    dispatch(loginSuccess(response.data));
+    toast("Logged In Successfully");
+    navigate("/");
+    
+  } catch (err) {
+    dispatch(loginFailure());
+    toast.error("Google Sign-In failed");
+    console.error(err);
+  }
+};
+
 
   return (
     <Container>
