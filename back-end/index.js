@@ -13,7 +13,7 @@ const app = express()
 //middelwares
 config()
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : ["http://localhost:5173", "https://streamify-mclj.onrender.com"],
     credentials: true
 }))
 app.use(express.json())
